@@ -1,7 +1,7 @@
 from re import X
 import unittest
 from src.ZigZag.Builder import ZigZagBuilder
-import src.ZigZag.Builder as zzb
+import src.ZigZag.Constant as zzb
 import pandas as pd
 import numpy as np
 import logging

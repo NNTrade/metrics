@@ -1,0 +1,5 @@
+FLAG_COL_NAME = "Flag"
+VALUE_COL_NAME = "Value"
+ANGLE_COL_NAME = "Angle"
+NEAREST_EXT = "Nearest_Ext"
+DELTA_NEAR_EXT = "Delta_Near_Ext"

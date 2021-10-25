@@ -1,16 +1,7 @@
-from os import name
-from re import S
-from unittest import runner
-from numpy.random.mtrand import f
 import pandas as pd
 from zigzag import *
 import numpy as np
-
-FLAG_COL_NAME = "Flag"
-VALUE_COL_NAME = "Value"
-ANGLE_COL_NAME = "Angle"
-NEAREST_EXT = "Nearest_Ext"
-DELTA_NEAR_EXT = "Delta_Near_Ext"
+from .Constant import *
 
 class ZigZagBuilder:
     def __init__(self,up_thresh:float=0.02, down_thresh:float=-0.02) -> None:
