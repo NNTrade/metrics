@@ -2,7 +2,6 @@
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.202.5/containers/python-3
 {
 	"name": "Python 3",
-	"runArgs": ["--init"],
 	"build": {
 		"dockerfile": "Dockerfile",
 		"context": "..",
@@ -30,7 +29,12 @@
 		"python.linting.mypyPath": "/usr/local/py-utils/bin/mypy",
 		"python.linting.pycodestylePath": "/usr/local/py-utils/bin/pycodestyle",
 		"python.linting.pydocstylePath": "/usr/local/py-utils/bin/pydocstyle",
-		"python.linting.pylintPath": "/usr/local/py-utils/bin/pylint"
+		"python.linting.pylintPath": "/usr/local/py-utils/bin/pylint",
+		"jupyter.alwaysTrustNotebooks": true,
+		"python.linting.pylintArgs": [
+			"--disable=import-error"
+		],
+		"jupyter.notebookFileRoot": "${workspaceFolder}"
 	},
 
 	// Add the IDs of extensions you want installed when the container is created.
