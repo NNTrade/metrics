@@ -15,7 +15,7 @@ with open(file_path) as requirements_txt:
     ]
 
 setuptools.setup(
-    name="metrics-for-trading",
+    name="metrics_for_trading",
     version="1.0.0",
     author="InsonusK",
     author_email="insonus.k@gmail.com",
