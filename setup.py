@@ -14,15 +14,18 @@ with open(file_path) as requirements_txt:
         in pkg_resources.parse_requirements(requirements_txt)
     ]
 
+lib = "traiding.metric"
+
 setuptools.setup(
-    name="metrics_for_trading",
-    version="1.0.1",
+    name=lib,
+    version="2.0.0",
     author="InsonusK",
     author_email="insonus.k@gmail.com",
     description="Framework with metrics for trading robots",
     long_description=long_description,
     url="https://github.com/NNTrade/metrics",
-    packages=setuptools.find_packages(where="./src"),
+    packages=[f"{lib}.{pkg}" for pkg in setuptools.find_packages(where="src")],
+    package_dir={lib:'src'},
     install_requires=install_requires,
     classifiers=[
         "Programming Language :: Python :: 3",
