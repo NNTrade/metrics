@@ -14,6 +14,5 @@ def draw_chart(chart_sr:pd.Series, zz_df:pd.DataFrame):
     axs[0].plot(np.arange(len(chart_sr)), zz_df[VALUE_COL_NAME], 'k-')
     axs[0].scatter(np.arange(len(chart_sr))[zz_df[FLAG_COL_NAME] == 1], zz_df[VALUE_COL_NAME][zz_df[FLAG_COL_NAME] == 1], color='g')
     axs[0].scatter(np.arange(len(chart_sr))[zz_df[FLAG_COL_NAME] == -1], zz_df[VALUE_COL_NAME][zz_df[FLAG_COL_NAME] == -1], color='r')
-    axs[0].plot(np.arange(len(chart_sr)), zz_df[NEAREST_EXT], 'b:')
 
     return (f, axs)
