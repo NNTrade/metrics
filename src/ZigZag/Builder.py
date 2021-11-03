@@ -1,7 +1,7 @@
 import pandas as pd
 from zigzag import *
 import numpy as np
-from .Constant import *
+from .Constant import FLAG_COL_NAME, VALUE_COL_NAME,ANGLE_COL_NAME,NEAREST_EXT,DELTA_NEAR_EXT
 
 class ZigZagBuilder:
     def __init__(self,up_thresh:float=0.02, down_thresh:float=-0.02) -> None:
