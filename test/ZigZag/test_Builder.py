@@ -252,7 +252,7 @@ class ZigZagBuilderTestCase(unittest.TestCase):
         x_sr = pd.Series(np.cumprod(1 + np.random.randn(10) * 0.01))
         x_sr.index = x_sr.index.values
         zz_f = ZigZagBuilder(0.01, -0.0001)
-        zz_f.delta_near_ext_name = "aoeu"
+        zz_f.delta_near_ext_col_name = "aoeu"
 
         asserted_sr = zz_f.build_delta_to_near_ext(x_sr)
         

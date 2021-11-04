@@ -11,7 +11,7 @@ class ZigZagBuilder:
         self.value_col_name = VALUE_COL_NAME
         self.angle_col_name = ANGLE_COL_NAME
         self.nearest_col_name = NEAREST_EXT
-        self.delta_near_ext_name = DELTA_NEAR_EXT
+        self.delta_near_ext_col_name = DELTA_NEAR_EXT
         pass
 
     def build_flags(self, data_sr:pd.Series)->pd.Series:
@@ -57,7 +57,7 @@ class ZigZagBuilder:
         return self.__build_nearest_ext__(data_idx_sr)
 
     def __build_delta_to_near_ext__(self,data_sr:pd.Series,near_ext_sr:pd.Series)->pd.Series:
-        return (near_ext_sr - data_sr).rename(self.delta_near_ext_name)
+        return (near_ext_sr - data_sr).rename(self.delta_near_ext_col_name)
 
     def build_delta_to_near_ext(self,data_sr:pd.Series)->pd.Series:
         data_idx_sr = data_sr.reset_index(drop=True)
@@ -85,7 +85,6 @@ class ZigZagBuilder:
         val_sr = self.__build_values__(data_idx_sr)
         return self.__build_angle__(val_sr)
 
-
     def build_all(self, data_sr:pd.Series)->pd.DataFrame:
         data_idx_sr = data_sr.reset_index(drop=True)
         flag_sr = self.__build_flags__(data_idx_sr)
@@ -94,6 +93,3 @@ class ZigZagBuilder:
         nearest_ext_sr = self.__build_nearest_ext__(data_idx_sr, flag_sr)
         delta_near_ext_sr = self.__build_delta_to_near_ext__(data_idx_sr,nearest_ext_sr)
         return pd.concat([flag_sr,value_sr,angle_sr, nearest_ext_sr,delta_near_ext_sr], axis=1)
-
-
-

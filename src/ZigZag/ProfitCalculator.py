@@ -9,11 +9,11 @@ def __get_perc_moves__(zz_df:pd.DataFrame)->pd.Series:
     perc_moves = moves[DELTA_NEAR_EXT]/moves[VALUE_COL_NAME]
     return perc_moves
 
-def product_of_profit(zz_df: pd.DataFrame)->double:
+def get_prod_of_profit(zz_df: pd.DataFrame)->double:
     perc_moves = __get_perc_moves__(zz_df)
     return (perc_moves+1).product()
 
-def sum_of_profit(zz_df: pd.DataFrame)->double:
+def get_sum_of_profit(zz_df: pd.DataFrame)->double:
     perc_moves = __get_perc_moves__(zz_df)
     return perc_moves.sum()
 
