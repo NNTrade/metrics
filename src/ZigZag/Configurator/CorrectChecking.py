@@ -26,7 +26,8 @@ class Check_len_size:
         pass
 
     def check(self,zz_df:pd.DataFrame)->bool:
-        idx_df = pd.DataFrame(zz_df[zz_df[FLAG_COL_NAME]!=0].index,columns=["idx"])
+        data_idx_sr = zz_df.reset_index(drop=True)
+        idx_df = pd.DataFrame(data_idx_sr[data_idx_sr[FLAG_COL_NAME]!=0].index,columns=["idx"])
         idx_df["next_idx"] = idx_df["idx"].shift(-1)
         idx_df["move"] = idx_df["next_idx"] - idx_df["idx"]
         return not idx_df[idx_df["move"] < self.min_len]["move"].any()
