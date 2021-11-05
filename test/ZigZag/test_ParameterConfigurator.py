@@ -1,7 +1,7 @@
 import unittest
 import logging
 import pandas as pd
-from src.ZigZag.ParameterConfigurator import Search_by_range
+from src.ZigZag.Configurator.ParameterConfigurator import Search_by_range
 import numpy as np
 
 class ParameterConfiguratorTestCase(unittest.TestCase):

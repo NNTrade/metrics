@@ -15,7 +15,7 @@ class Counter:
         self.last_block = self.last_block + 1
         if self.last_block >= self.step:
             cur_progress = self.cur*10000//self.len/100
-            self.logger.info(f"Progress: {cur_progress}%")
+            self.logger.debug(f"Progress: {cur_progress}%")
             if self.info_func is not None:
                 self.info_func(cur_progress)
             self.last_block = 0
