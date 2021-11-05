@@ -1,7 +1,7 @@
 import unittest
 import logging
 import pandas as pd
-from src.ZigZag.Constant import FLAG_COL_NAME, VALUE_COL_NAME, DELTA_NEAR_EXT
+from src.ZigZag.Constant import FLAG_COL_NAME, VALUE_COL_NAME, DELTA_NEAR_EXT_COL_NAME
 from src.ZigZag.ProfitCalculator import get_profit
 
 class ProfitCalculatorTestCase(unittest.TestCase):
@@ -10,7 +10,7 @@ class ProfitCalculatorTestCase(unittest.TestCase):
                     datefmt = '%m/%d/%Y %I:%M:%S %p', level = logging.DEBUG)
 
     def test_profitCalculation__check(self):
-        zz_df = pd.DataFrame(data=[[1, 1, 0.5],[-1, 1.5, 0.75]],columns=[FLAG_COL_NAME, VALUE_COL_NAME, DELTA_NEAR_EXT])
+        zz_df = pd.DataFrame(data=[[1, 1, 0.5],[-1, 1.5, 0.75]],columns=[FLAG_COL_NAME, VALUE_COL_NAME, DELTA_NEAR_EXT_COL_NAME])
         
         asserted_df = get_profit(zz_df)
 

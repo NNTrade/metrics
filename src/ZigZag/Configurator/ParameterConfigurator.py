@@ -1,5 +1,5 @@
 from typing import List
-from numpy import log
+import numpy as np
 import pandas as pd
 from typing import List,Tuple
 from ..Builder import ZigZagBuilder
@@ -12,7 +12,7 @@ from ..Constant import FLAG_COL_NAME, ANGLE_COL_NAME
 
 def prod_max_func(zz_df: pd.DataFrame, max_val: None)->Tuple[bool,float]:
     prod = get_prod_of_profit(zz_df)
-    if not max_val is not None:
+    if np.isnan(max_val):
         return (True, prod)
     if prod > max_val:
         return (True, prod)
@@ -24,8 +24,8 @@ def __base_check__():
     return Check_machine([check_no_same_move_direction, len_checker.check]).check_is_correct
 
 def Search_by_range(sr:pd.Series, up_thresh_list:List[float], down_thresh_list:List[float], compare_func = prod_max_func, check_func = __base_check__(), check_zz_df:bool = True)->Tuple[float,float]:
-    max_val = None
-    best_parameter = None
+    max_val = np.NAN
+    best_parameter = np.NAN
     logger = logging.getLogger("Search_by_range")
     counter = Counter(len(up_thresh_list)*len(down_thresh_list))
 

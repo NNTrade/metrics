@@ -35,16 +35,7 @@ class ZigZagBuilderTestCase(unittest.TestCase):
 
         asserted_sr = zz_f.build_flags(x_sr)        
         self.assertEqual(zzb.FLAG_COL_NAME, asserted_sr.name)
-    
-    def test_flags_custom_name(self):
-        np.random.seed(1997)
-        x_sr = pd.Series(np.cumprod(1 + np.random.randn(10) * 0.01))
-        zz_f = ZigZagBuilder(0.01, -0.0001)
-        zz_f.flag_col_name = "aoeui"
-
-        asserted_sr = zz_f.build_flags(x_sr)        
-        self.assertEqual("aoeui", asserted_sr.name)
-    
+       
     def test_values(self):
         np.random.seed(1997)
         x_sr = pd.Series(np.cumprod(1 + np.random.randn(10) * 0.01))
@@ -68,17 +59,7 @@ class ZigZagBuilderTestCase(unittest.TestCase):
         zz_f = ZigZagBuilder(0.01, -0.0001)
 
         asserted_sr = zz_f.build_values(x_sr)
-        self.assertEqual(zzb.VALUE_COL_NAME, asserted_sr.name)
-    
-    def test_value_custom_name(self):
-        np.random.seed(1997)
-        x_sr = pd.Series(np.cumprod(1 + np.random.randn(10) * 0.01))
-        zz_f = ZigZagBuilder(0.01, -0.0001)
-        zz_f.value_col_name = "aoeui"
-
-        asserted_sr = zz_f.build_values(x_sr)
-        self.assertEqual("aoeui", asserted_sr.name)
-
+        self.assertEqual(zzb.VALUE_COL_NAME, asserted_sr.name)    
 
     def test_angle(self):
         np.random.seed(1997)
@@ -119,16 +100,6 @@ class ZigZagBuilderTestCase(unittest.TestCase):
         asserted_sr = zz_f.build_angle(x_sr)
 
         self.assertEqual(asserted_sr.name, zzb.ANGLE_COL_NAME)
-
-    def test_angle_cust_name(self):
-        np.random.seed(1997)
-        x_sr = pd.Series(np.cumprod(1 + np.random.randn(10) * 0.01))
-        zz_f = ZigZagBuilder(0.01, -0.0001)
-        zz_f.angle_col_name = "aoeu"
-
-        asserted_sr = zz_f.build_angle(x_sr)
-
-        self.assertEqual(asserted_sr.name, "aoeu")
 
     def test_nearest_ext(self):
         np.random.seed(1997)
@@ -182,17 +153,8 @@ class ZigZagBuilderTestCase(unittest.TestCase):
 
         asserted_sr = zz_f.build_nearest_ext(x_sr)
 
-        self.assertEqual(asserted_sr.name, zzb.NEAREST_EXT)
+        self.assertEqual(asserted_sr.name, zzb.NEAREST_EXT_COL_NAME)
 
-    def test_nearest_ext_cust_name(self):
-        np.random.seed(1997)
-        x_sr = pd.Series(np.cumprod(1 + np.random.randn(10) * 0.01))
-        zz_f = ZigZagBuilder(0.01, -0.0001)
-        zz_f.nearest_col_name = "aoeu"
-
-        asserted_sr = zz_f.build_nearest_ext(x_sr)
-
-        self.assertEqual(asserted_sr.name, "aoeu")
         
     def test_delta_to_near_ext(self):
         np.random.seed(1997)
@@ -246,19 +208,8 @@ class ZigZagBuilderTestCase(unittest.TestCase):
 
         asserted_sr = zz_f.build_delta_to_near_ext(x_sr)
         
-        self.assertEqual(asserted_sr.name, zzb.DELTA_NEAR_EXT)
+        self.assertEqual(asserted_sr.name, zzb.DELTA_NEAR_EXT_COL_NAME)
 
-    def test_delta_to_near_ext_custom_name(self):
-        np.random.seed(1997)
-
-        x_sr = pd.Series(np.cumprod(1 + np.random.randn(10) * 0.01))
-        x_sr.index = x_sr.index.values
-        zz_f = ZigZagBuilder(0.01, -0.0001)
-        zz_f.delta_near_ext_col_name = "aoeu"
-
-        asserted_sr = zz_f.build_delta_to_near_ext(x_sr)
-        
-        self.assertEqual(asserted_sr.name, "aoeu")
 
     def test_index_return_same_index__check(self):
         np.random.seed(1997)
@@ -322,3 +273,82 @@ class ZigZagBuilderTestCase(unittest.TestCase):
         for i in x_dt_idx:
             self.logger.debug(f"Compare")
             self.assertEqual(expected_sr[i], asserted_sr[i], msg=f"index {i}")
+
+
+    def test_index_next_ext(self):
+        np.random.seed(1997)
+        
+        start_date = date(2000,1,1)
+        x_dt_idx = []
+        for i in range(10):
+            x_dt_idx.append(start_date)
+            start_date = start_date+timedelta(days=1)
+            while start_date.weekday() >= 5:
+                start_date = start_date+timedelta(days=1)
+        
+        x_sr = pd.Series(np.cumprod(1 + np.random.randn(10) * 0.01), index=x_dt_idx)
+
+        zz_f = ZigZagBuilder(0.01, -0.0001)
+
+        asserted_sr = zz_f.build_next_index(x_sr)
+        expected_sr = pd.Series([   date(2000,1,3),
+                                    date(2000,1,4),
+                                    date(2000,1,11),
+                                    date(2000,1,11),
+                                    date(2000,1,11),
+                                    date(2000,1,11),
+                                    date(2000,1,11),
+                                    date(2000,1,13),
+                                    date(2000,1,13),
+                                    np.NaN], index=x_dt_idx)
+        
+        self.logger.debug(x_sr)
+        self.logger.debug(asserted_sr)
+        self.logger.debug(expected_sr)
+
+        self.assertEqual(len(asserted_sr), len(expected_sr))
+        for i in x_dt_idx:
+            self.logger.debug(f"Compare")
+            if expected_sr[i] is not np.NaN:
+                self.assertEqual(expected_sr[i], asserted_sr[i], msg=f"index {i}")
+            else:
+                self.assertTrue(np.isnan(asserted_sr[i]))
+    
+    def test_row_to_next_ext(self):
+        np.random.seed(1997)
+        
+        start_date = date(2000,1,1)
+        x_dt_idx = []
+        for i in range(10):
+            x_dt_idx.append(start_date)
+            start_date = start_date+timedelta(days=1)
+            while start_date.weekday() >= 5:
+                start_date = start_date+timedelta(days=1)
+        
+        x_sr = pd.Series(np.cumprod(1 + np.random.randn(10) * 0.01), index=x_dt_idx)
+
+        zz_f = ZigZagBuilder(0.01, -0.0001)
+
+        asserted_sr = zz_f.rows_to_next_ext(x_sr)
+        expected_sr = pd.Series([   1,
+                                    1,
+                                    5,
+                                    4,
+                                    3,
+                                    2,
+                                    1,
+                                    2,
+                                    1,
+                                    np.NaN], index=x_dt_idx)
+        
+        self.logger.debug(x_sr)
+        self.logger.debug(asserted_sr)
+        self.logger.debug(expected_sr)
+
+        self.assertEqual(len(asserted_sr), len(expected_sr))
+        for i in x_dt_idx:
+            self.logger.debug(f"Compare")
+            if np.isnan(expected_sr[i]):
+                self.assertTrue(np.isnan(asserted_sr[i]))
+            else:
+                self.assertEqual(expected_sr[i], asserted_sr[i], msg=f"index {i}")
