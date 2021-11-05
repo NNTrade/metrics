@@ -16,7 +16,7 @@ class ZigZagBuilder:
 
     def build_flags(self, data_sr:pd.Series)->pd.Series:
         data_idx_sr = data_sr.reset_index(drop=True)
-        return self.__build_flags__(data_idx_sr)
+        return self.__prepare_return_index(self.__build_flags__(data_idx_sr),data_sr)
 
     def __build_flags__(self, data_sr:pd.Series)->pd.Series:
         pivot = peak_valley_pivots(data_sr, self.up_thresh, self.down_thresh)
@@ -31,7 +31,7 @@ class ZigZagBuilder:
 
     def build_values(self, data_sr:pd.Series)->pd.Series:
         data_idx_sr = data_sr.reset_index(drop=True)        
-        return self.__build_values__(data_idx_sr)
+        return self.__prepare_return_index(self.__build_values__(data_idx_sr),data_sr)
 
     def __build_nearest_ext__(self, data_sr:pd.Series, flag_sr:pd.Series = None)->pd.Series:
         if not (flag_sr is not None):
@@ -54,7 +54,7 @@ class ZigZagBuilder:
 
     def build_nearest_ext(self, data_sr:pd.Series)->pd.Series:
         data_idx_sr = data_sr.reset_index(drop=True)        
-        return self.__build_nearest_ext__(data_idx_sr)
+        return self.__prepare_return_index(self.__build_nearest_ext__(data_idx_sr),data_sr)
 
     def __build_delta_to_near_ext__(self,data_sr:pd.Series,near_ext_sr:pd.Series)->pd.Series:
         return (near_ext_sr - data_sr).rename(self.delta_near_ext_col_name)
@@ -62,7 +62,7 @@ class ZigZagBuilder:
     def build_delta_to_near_ext(self,data_sr:pd.Series)->pd.Series:
         data_idx_sr = data_sr.reset_index(drop=True)
         near_ext_sr = self.__build_nearest_ext__(data_sr=data_idx_sr)
-        return self.__build_delta_to_near_ext__(data_idx_sr, near_ext_sr)
+        return self.__prepare_return_index(self.__build_delta_to_near_ext__(data_idx_sr, near_ext_sr),data_sr)
 
     def __build_angle__(self, val_sr:pd.Series)->pd.Series:
         class worker:
@@ -83,7 +83,11 @@ class ZigZagBuilder:
     def build_angle(self,data_sr:pd.Series)->pd.Series:
         data_idx_sr = data_sr.reset_index(drop=True)
         val_sr = self.__build_values__(data_idx_sr)
-        return self.__build_angle__(val_sr)
+        return self.__prepare_return_index(self.__build_angle__(val_sr),data_sr)
+
+    def __prepare_return_index(self, ret_df:pd.DataFrame, data_sr:pd.Series):
+        ret_df.index = data_sr.index
+        return ret_df
 
     def build_all(self, data_sr:pd.Series)->pd.DataFrame:
         data_idx_sr = data_sr.reset_index(drop=True)
@@ -92,4 +96,4 @@ class ZigZagBuilder:
         angle_sr = self.__build_angle__(value_sr)
         nearest_ext_sr = self.__build_nearest_ext__(data_idx_sr, flag_sr)
         delta_near_ext_sr = self.__build_delta_to_near_ext__(data_idx_sr,nearest_ext_sr)
-        return pd.concat([flag_sr,value_sr,angle_sr, nearest_ext_sr,delta_near_ext_sr], axis=1)
+        return self.__prepare_return_index(pd.concat([flag_sr,value_sr,angle_sr, nearest_ext_sr,delta_near_ext_sr], axis=1),data_sr)

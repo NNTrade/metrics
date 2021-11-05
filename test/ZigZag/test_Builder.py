@@ -5,6 +5,8 @@ import src.ZigZag.Constant as zzb
 import pandas as pd
 import numpy as np
 import logging
+from datetime import date
+from datetime import timedelta 
 
 class ZigZagBuilderTestCase(unittest.TestCase):
     logger = logging.getLogger(__name__)
@@ -257,3 +259,66 @@ class ZigZagBuilderTestCase(unittest.TestCase):
         asserted_sr = zz_f.build_delta_to_near_ext(x_sr)
         
         self.assertEqual(asserted_sr.name, "aoeu")
+
+    def test_index_return_same_index__check(self):
+        np.random.seed(1997)
+        X = np.cumprod(1 + np.random.randn(300) * 0.01)
+        start_date = date(2000,1,1)
+        x_dt_idx = []
+        for i in range(300):
+            x_dt_idx.append(start_date)
+            start_date = start_date+timedelta(days=1)
+            while start_date.weekday() >= 5:
+                start_date = start_date+timedelta(days=1)
+
+        x_sr = pd.Series(X,index=x_dt_idx)
+        zz_df = ZigZagBuilder(0.01, -0.0001).build_all(x_sr)
+
+        self.assertTrue((np.array(x_sr.index) == np.array(zz_df.index)).all())
+
+        zz_df = ZigZagBuilder(0.01, -0.0001).build_angle(x_sr)
+
+        self.assertTrue((np.array(x_sr.index) == np.array(zz_df.index)).all())
+
+        zz_df = ZigZagBuilder(0.01, -0.0001).build_delta_to_near_ext(x_sr)
+
+        self.assertTrue((np.array(x_sr.index) == np.array(zz_df.index)).all())
+
+        zz_df = ZigZagBuilder(0.01, -0.0001).build_flags(x_sr)
+
+        self.assertTrue((np.array(x_sr.index) == np.array(zz_df.index)).all())
+
+        zz_df = ZigZagBuilder(0.01, -0.0001).build_nearest_ext(x_sr)
+
+        self.assertTrue((np.array(x_sr.index) == np.array(zz_df.index)).all())
+
+        zz_df = ZigZagBuilder(0.01, -0.0001).build_values(x_sr)
+
+        self.assertTrue((np.array(x_sr.index) == np.array(zz_df.index)).all())
+
+    def test_values_if_index_is_dt(self):
+        np.random.seed(1997)
+        
+        start_date = date(2000,1,1)
+        x_dt_idx = []
+        for i in range(10):
+            x_dt_idx.append(start_date)
+            start_date = start_date+timedelta(days=1)
+            while start_date.weekday() >= 5:
+                start_date = start_date+timedelta(days=1)
+        
+        x_sr = pd.Series(np.cumprod(1 + np.random.randn(10) * 0.01), index=x_dt_idx)
+
+        zz_f = ZigZagBuilder(0.01, -0.0001)
+
+        asserted_sr = zz_f.build_values(x_sr)
+        expected_sr = pd.Series([1.0044463998665076,   1.0046937332832246,   1.0045308129101491,   1.0151116686597472,   1.0256925244093453,   1.0362733801589432,   1.0468542359085413,   1.0574350916581394,   1.0611845576172567,   1.0649340235763742], index=x_dt_idx)
+        
+        self.logger.debug(x_sr)
+        self.logger.debug(zz_f.build_flags(x_sr))
+        self.logger.debug(asserted_sr)
+
+        self.assertEqual(len(asserted_sr), len(expected_sr))
+        for i in x_dt_idx:
+            self.logger.debug(f"Compare")
+            self.assertEqual(expected_sr[i], asserted_sr[i], msg=f"index {i}")
