@@ -2,6 +2,7 @@ import pandas as pd
 from zigzag import *
 import numpy as np
 from .Constant import FLAG_COL_NAME, NEXT_INDEX_COL_NAME, ROWS_TO_NEXT_EXT_COL_NAME, VALUE_COL_NAME,ANGLE_COL_NAME,NEAREST_EXT_COL_NAME,DELTA_NEAR_EXT_COL_NAME
+from .Tool.Rows_to_next_ext_builder import Rows_to_next_ext_builder
 
 class ZigZagBuilder:
     def __init__(self,up_thresh:float=0.02, down_thresh:float=-0.02) -> None:
@@ -98,30 +99,7 @@ class ZigZagBuilder:
 
     def rows_to_next_ext(self, data_sr:pd.Series)->pd.Series:
         flag_sr = self.build_flags(data_sr)
-        return self.__rows_to_next_ext__(data_sr, flag_sr)
-
-    def __rows_to_next_ext__(self, data_sr:pd.Series, flag_sr:pd.Series = None)->pd.Series:
-        class worker:
-            def __init__(self) -> None:
-                self.cur_counter = np.NAN
-                pass
-            def next(self, cur_val):
-                if np.isnan(cur_val):
-                    return np.NAN
-                else:
-                    if cur_val != 0:
-                        _ret = self.cur_counter + 1
-                        self.cur_counter = 0
-                        return _ret
-                    else:
-                        self.cur_counter = self.cur_counter + 1 
-                        return self.cur_counter
-
-        wrk = worker()
-        _ret_arr = []
-        for idx in reversed(flag_sr.index):
-            _ret_arr.append(wrk.next(flag_sr[idx]))
-        return pd.Series(reversed(_ret_arr), index=data_sr.index,name=ROWS_TO_NEXT_EXT_COL_NAME)
+        return Rows_to_next_ext_builder(flag_sr)
 
     def build_all(self, data_sr:pd.Series)->pd.DataFrame:
         data_idx_sr = data_sr.reset_index(drop=True)
@@ -132,7 +110,7 @@ class ZigZagBuilder:
         _ret[NEAREST_EXT_COL_NAME] = self.__build_nearest_ext__(data_sr, _ret[FLAG_COL_NAME])
         _ret[DELTA_NEAR_EXT_COL_NAME] = self.__build_delta_to_near_ext__(data_sr,_ret[NEAREST_EXT_COL_NAME])
         _ret[NEXT_INDEX_COL_NAME] = self.__build_next_index__(data_sr, _ret[FLAG_COL_NAME])
-        _ret[ROWS_TO_NEXT_EXT_COL_NAME] = self.__rows_to_next_ext__(data_sr, _ret[FLAG_COL_NAME])
+        _ret[ROWS_TO_NEXT_EXT_COL_NAME] = Rows_to_next_ext_builder(_ret[FLAG_COL_NAME])
         return _ret
 
     def __prepare_return_index(self, ret_df:pd.DataFrame, data_sr:pd.Series):
