@@ -21,22 +21,25 @@ def no_same_move_direction_is_correct(zz_df:pd.DataFrame):
     angle_check:pd.Series = picks_zz[FLAG_COL_NAME] * picks_zz[ANGLE_COL_NAME]     
     return not angle_check[angle_check>0].any()   
 
-class Check_len_size:
-    
+class Check_len_size:       
     def __init__(self,min_len = 10, max_len = np.NaN) -> None:
         self.min_len = min_len
         self.max_len = max_len
         pass
 
     def is_correct(self,zz_df:pd.DataFrame)->bool:
-        data_idx_sr = zz_df.reset_index(drop=True)
-        idx_df = pd.DataFrame(data_idx_sr[data_idx_sr[FLAG_COL_NAME]!=0].index,columns=["idx"])
-        idx_df["next_idx"] = idx_df["idx"].shift(-1)
-        idx_df["move"] = idx_df["next_idx"] - idx_df["idx"]
+        min_max_tuple = Check_len_size.get_min_max(zz_df[FLAG_COL_NAME])
         is_correct = True
         if not np.isnan(self.min_len):
-            is_correct = is_correct and not idx_df[idx_df["move"] < self.min_len]["move"].any()
+            is_correct = is_correct and not min_max_tuple[0] < self.min_len
         if not np.isnan(self.max_len):
-            is_correct = is_correct and not idx_df[idx_df["move"] > self.max_len]["move"].any()
+            is_correct = is_correct and not min_max_tuple[1] > self.max_len
         return is_correct
-        
+
+    @staticmethod
+    def get_min_max(zz_sr:pd.Series)->int:
+        data_idx_sr = zz_sr.reset_index(drop=True)
+        idx_df = pd.DataFrame(data_idx_sr[data_idx_sr!=0].index,columns=["idx"])
+        idx_df["next_idx"] = idx_df["idx"].shift(-1)
+        idx_df["move"] = idx_df["next_idx"] - idx_df["idx"]
+        return (idx_df["move"].min(), idx_df["move"].max())
