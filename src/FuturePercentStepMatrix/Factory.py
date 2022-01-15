@@ -1,4 +1,3 @@
-import enum
 import pandas as pd
 from typing import List, Union
 from .Builder import Compare, _check_step, _check_compare, _BuildMatrix, BuildMatrix

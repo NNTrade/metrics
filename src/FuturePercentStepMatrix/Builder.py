@@ -1,4 +1,3 @@
-from ast import arg
 from typing import List,Union
 from traiding.indicator.RelativePercent.Factory import get_percent
 import pandas as pd
