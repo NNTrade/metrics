@@ -41,12 +41,13 @@ class Factory:
         percent_np = np.array(percent_arr)
         _check_step(step_np)
         _check_compare(percent_np, compare)
-
+        
+        args = {"is_ext": True}
         _ret_df: pd.DataFrame = pd.DataFrame(index=base_value_sr.index)
         for step in step_arr:
             agr_value_sr = Factory._get_ext(
                 Factory._agr_values(value_sr, step, use_first), compare)
             _ret_df = _ret_df.join(_BuildMatrix(base_value_sr, agr_value_sr, [
-                                   step], percent_arr, self.use_abs, compare))
+                                   step], percent_arr, self.use_abs, compare,**args))
 
         return _ret_df

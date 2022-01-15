@@ -18,7 +18,7 @@ lib = "traiding.metric"
 
 setuptools.setup(
     name=lib,
-    version="3.1.0",
+    version="3.1.1",
     author="InsonusK",
     author_email="insonus.k@gmail.com",
     description="Framework with metrics for trading robots",

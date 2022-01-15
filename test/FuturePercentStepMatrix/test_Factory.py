@@ -18,12 +18,12 @@ class FactoryTestCase(unittest.TestCase):
         value_df = pd.DataFrame({"H": [100, 2.5, 2],"L": [50, 1, 5]}, index=base_value_sr.index).join(base_value_sr)
 
         expect_matrix = pd.DataFrame({
-            "P(VH149)[Sh1-cls]": [True, True, np.NAN],
-            "P(VH151)[Sh1-cls]": [False, False, np.NAN],
-            "P(VH401)[Sh1-cls]": [False, False, np.NAN],
-            "P(VH149)[Sh2-cls]": [True, np.NAN, np.NAN],
-            "P(VH151)[Sh2-cls]": [True, np.NAN, np.NAN],
-            "P(VH401)[Sh2-cls]": [False, np.NAN, np.NAN]
+            "P(VH149)[ESh1-cls]": [True, True, np.NAN],
+            "P(VH151)[ESh1-cls]": [False, False, np.NAN],
+            "P(VH401)[ESh1-cls]": [False, False, np.NAN],
+            "P(VH149)[ESh2-cls]": [True, np.NAN, np.NAN],
+            "P(VH151)[ESh2-cls]": [True, np.NAN, np.NAN],
+            "P(VH401)[ESh2-cls]": [False, np.NAN, np.NAN]
         }, index=["A1", "B2", "C3"])
 
         fctr = Factory(use_abs=False)

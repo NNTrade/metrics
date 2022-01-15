@@ -1,3 +1,4 @@
+from ast import arg
 from typing import List,Union
 from traiding.indicator.RelativePercent.Factory import get_percent
 import pandas as pd
@@ -36,8 +37,10 @@ class Compare(Enum):
         elif self == Compare.VolatilityLower:
             return "VL"
 
-def col_name_default(percent:float, step: int, value_sr_name:str,compare:Compare):
-    return f"P({compare.ShortName()}{percent})[Sh{step}-{value_sr_name}]"
+def col_name_default(percent:float, step: int, value_sr_name:str,compare:Compare, **args):
+    is_ext = args["is_ext"] if "is_ext" in args else False
+    shift_name = "ESh" if is_ext else "Sh"
+    return f"P({compare.ShortName()}{percent})[{shift_name}{step}-{value_sr_name}]"
 
 def BuildMatrix(value_sr:pd.Series, step_arr:Union[List[int],pd.Series], percent_arr:List[float], use_abs:bool=False, compare=Compare.VolatilityHigher)->pd.DataFrame:
     """Get matrix of percent step values
@@ -75,7 +78,7 @@ def _check_step(step_np:np.array):
     if  np.any(c > 1):
         raise ValueError("step_arr has duplicate value") 
 
-def _BuildMatrix(base_value_sr:pd.Series,value_sr:pd.Series, step_arr:Union[List[int],pd.Series], percent_arr:List[float], use_abs:bool=False, compare=Compare.VolatilityHigher)->pd.DataFrame:
+def _BuildMatrix(base_value_sr:pd.Series,value_sr:pd.Series, step_arr:Union[List[int],pd.Series], percent_arr:List[float], use_abs:bool=False, compare=Compare.VolatilityHigher, **args)->pd.DataFrame:
     """Get matrix of percent step values
 
     Args:
@@ -95,7 +98,7 @@ def _BuildMatrix(base_value_sr:pd.Series,value_sr:pd.Series, step_arr:Union[List
         step_val_sr = value_sr.shift(-step)
         perc_sr = get_percent(step_val_sr, base_value_sr,use_abs)
         for percent in percent_arr:
-            col_name = col_name_default(percent,step,base_value_sr.name,compare)
+            col_name = col_name_default(percent,step,base_value_sr.name,compare,**args)
             if compare == Compare.VolatilityHigher or compare == Compare.VolatilityLower:
                 perc_sr = perc_sr.abs()           
                 percent = abs(percent)
