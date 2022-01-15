@@ -10,12 +10,13 @@ file_path = os.path.join(Path('.'), "requirements.txt")
 install_requires = []
 with open(file_path) as requirements_txt:
     for requirement in pkg_resources.parse_requirements(requirements_txt):
-        install_requires.append(requirement)
+        install_requires.append(str(requirement))
         
 file_path = os.path.join(Path('.'), "requirements_ssh.txt")
 with open(file_path) as requirements_txt:
     for requirement in pkg_resources.parse_requirements(requirements_txt):
-        install_requires.append(requirement)
+        install_requires.append(str(requirement))
+print(install_requires)
 
 lib = "traiding.metric"
 
