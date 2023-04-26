@@ -2,18 +2,7 @@
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.202.5/containers/python-3
 {
 	"name": "Python 3",
-	"build": {
-		"dockerfile": "Dockerfile",
-		"context": "..",
-		"args": { 
-			// Update 'VARIANT' to pick a Python version: 3, 3.10, 3.9, 3.8, 3.7, 3.6
-			// Append -bullseye or -buster to pin to an OS version.
-			// Use -bullseye variants on local on arm64/Apple Silicon.
-			//"VARIANT": "3.9",
-			// Options
-			//"NODE_VERSION": "none"
-		}
-	},
+	"image": "mcr.microsoft.com/devcontainers/python:0-3.11",
 
 	// Set *default* container specific settings.json values on container create.
 	"settings": { 
@@ -43,14 +32,15 @@
 		"ms-python.vscode-pylance",
 		"donjayamanne.python-extension-pack",
 		"visualstudioexptteam.intellicode-api-usage-examples",
-		"ms-toolsai.jupyter"
+		"ms-toolsai.jupyter",
+		"njpwerner.autodocstring"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "pip3 install --user -r requirements.txt",
+	"postCreateCommand": "sh ./.devcontainer/post_commands.sh",
 
 	// Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode"

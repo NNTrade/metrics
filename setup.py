@@ -18,11 +18,11 @@ with open(file_path) as requirements_txt:
         install_requires.append(str(requirement))
 print(install_requires)
 
-lib = "traiding.metric"
+lib = "NNTrade.metric"
 
 setuptools.setup(
     name=lib,
-    version="3.1.2",
+    version="4.0.0",
     author="InsonusK",
     author_email="insonus.k@gmail.com",
     description="Framework with metrics for trading robots",

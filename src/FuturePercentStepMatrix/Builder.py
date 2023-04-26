@@ -1,5 +1,5 @@
 from typing import List,Union
-from traiding.indicator.RelativePercent.Factory import get_percent
+#from traiding.indicator.RelativePercent.Factory import get_percent
 import pandas as pd
 import numpy as np
 from enum import Enum
@@ -95,7 +95,7 @@ def _BuildMatrix(base_value_sr:pd.Series,value_sr:pd.Series, step_arr:Union[List
     
     for step in step_arr:
         step_val_sr = value_sr.shift(-step)
-        perc_sr = get_percent(step_val_sr, base_value_sr,use_abs)
+        perc_sr = None #get_percent(step_val_sr, base_value_sr,use_abs)
         for percent in percent_arr:
             col_name = col_name_default(percent,step,base_value_sr.name,compare,**args)
             if compare == Compare.VolatilityHigher or compare == Compare.VolatilityLower:
