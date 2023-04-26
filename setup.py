@@ -12,17 +12,13 @@ with open(file_path) as requirements_txt:
     for requirement in pkg_resources.parse_requirements(requirements_txt):
         install_requires.append(str(requirement))
         
-file_path = os.path.join(Path('.'), "requirements_ssh.txt")
-with open(file_path) as requirements_txt:
-    for requirement in pkg_resources.parse_requirements(requirements_txt):
-        install_requires.append(str(requirement))
 print(install_requires)
 
 lib = "NNTrade.metric"
 
 setuptools.setup(
     name=lib,
-    version="4.0.0",
+    version="4.0.1",
     author="InsonusK",
     author_email="insonus.k@gmail.com",
     description="Framework with metrics for trading robots",
