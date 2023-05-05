@@ -1,6 +1,6 @@
 from enum import Enum
 
 class ClosingType(Enum):
-  OnClose = "OnClose"
-  OnIncomeLimit = "OnIncomeLimit"
-  OnLossLimit = "OnLossLimit"
+  OnClose = 0
+  OnIncomeLimit = 1
+  OnLossLimit = -1
