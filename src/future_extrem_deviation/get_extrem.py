@@ -3,30 +3,7 @@ from .extrem_type import ExtreamType
 from NNTrade.common.candle_col_name import OPEN, HIGH, LOW
 from typing import List, Tuple
 from .constant.output_col_name import get_idx_col, get_shift_col, get_value_col, get_rel_col
-
-def __get_extrem_with_lim(open_sr:pd.Series, shifted_v_df:pd.DataFrame,extrem_type:ExtreamType, limit:float = None)->Tuple[pd.Series,pd.Series]:
-  if limit <= 0:
-    raise AttributeError("Limit must be positive number")
-  extremum_value_sr = shifted_v_df[shifted_v_df.columns[0]]
-  extremum_idx_sr = pd.Series(0, index=extremum_value_sr.index)
-  rel_sr = (extremum_value_sr  - open_sr) / open_sr
-  if extrem_type == ExtreamType.High:
-    for c in shifted_v_df.columns:
-      new_value_sr:pd.Series = shifted_v_df[c][(extremum_value_sr < shifted_v_df[c]) & (rel_sr < limit)]
-      extremum_value_sr.loc[new_value_sr.index] = new_value_sr
-      extremum_idx_sr.loc[new_value_sr.index] = c
-      rel_sr.loc[new_value_sr.index] = (new_value_sr  - open_sr.loc[new_value_sr.index]) / open_sr.loc[new_value_sr.index]
-      if (rel_sr >= limit).all():
-        break
-  elif extrem_type == ExtreamType.Low:
-    for c in shifted_v_df.columns:
-      new_value_sr:pd.Series = shifted_v_df[c][(extremum_value_sr > shifted_v_df[c]) & (rel_sr > -limit)]
-      extremum_value_sr.loc[new_value_sr.index] = new_value_sr
-      extremum_idx_sr.loc[new_value_sr.index] = c
-      rel_sr.loc[new_value_sr.index] = (new_value_sr  - open_sr.loc[new_value_sr.index]) / open_sr.loc[new_value_sr.index]
-      if (rel_sr <= -limit).all():
-          break
-  return extremum_value_sr, extremum_idx_sr
+from .extrem_calculation_container import ExtremCalculationContainer
 
 def get_extrem_of(quote_df:pd.DataFrame, period:int, extrem_type:ExtreamType, limit:float = None, use_base_names:bool = False)->pd.DataFrame:
   """Get extem price value in period
@@ -67,7 +44,7 @@ def get_extrem_of(quote_df:pd.DataFrame, period:int, extrem_type:ExtreamType, li
       extrem_sr = shifted_v_df.min(axis=1)
       shift_to_extrem = shifted_v_df.idxmin(axis=1).astype(int)
   else:
-    extrem_sr, shift_to_extrem = __get_extrem_with_lim(quote_df[OPEN], shifted_v_df, extrem_type, limit)
+    _, extrem_sr, shift_to_extrem = ExtremCalculationContainer(quote_df[OPEN], shifted_v_df, extrem_type, limit).get_extrem_with_lim()
   extrem_id_sr = shifted_idx_df.apply(lambda row: row[shift_to_extrem.loc[row.name]], axis=1)
   return pd.DataFrame({result_v_name: extrem_sr,result_id_name:extrem_id_sr, result_shift_name:shift_to_extrem}, index=quote_df.index)
   #return (shifted_v_df.max(axis=1) if extrem_type == ExtreamType.High else shifted_v_df.min(axis=1)).rename(result_v_name)
@@ -86,8 +63,7 @@ def get_extrem_rel_of(quote_df:pd.DataFrame, period:int, extrem_type:ExtreamType
   """
   extrem_df = get_extrem_of(quote_df, period, extrem_type, limit, use_base_names)
   rel_sr = ((extrem_df[get_value_col(extrem_type,use_base_names)] - quote_df[OPEN]) / quote_df[OPEN]).rename(get_rel_col(extrem_type,use_base_names))
-  v_col = get_value_col(extrem_type,use_base_names)
-  return pd.concat([rel_sr, *[extrem_df[c] for c in extrem_df.columns if c != v_col]],axis=1)
+  return pd.concat([rel_sr, extrem_df],axis=1)
   
 
 def get_extrem_rel_matrix_of(quote_df:pd.DataFrame, periods:List[int], extrem_types:List[ExtreamType] = [ExtreamType.High, ExtreamType.Low], limit:float = None)->pd.DataFrame:
