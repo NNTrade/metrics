@@ -62,14 +62,14 @@ class ProfitCalculationContainer:
   @property
   def income_sr(self)->pd.Series:
     if self.__income_sr is None:
-      self.__income_sr = self.trading_dir.value * (self.income_extrem_df[EXTREM_OF_BASE] - self.quote_df[OPEN]) / self.quote_df[OPEN]
+      self.__income_sr = (self.trading_dir.value * (self.income_extrem_df[EXTREM_OF_BASE] - self.quote_df[OPEN]) / self.quote_df[OPEN]).round(5)
       self.__income_sr.loc[self.__income_sr > self.income_limit] = self.income_limit
     return self.__income_sr
   
   @property
   def loss_sr(self)->pd.Series:
     if self.__loss_sr is None:
-      self.__loss_sr = self.trading_dir.value * (self.loss_extrem_df[EXTREM_OF_BASE] - self.quote_df[OPEN]) / self.quote_df[OPEN]
+      self.__loss_sr = (self.trading_dir.value * (self.loss_extrem_df[EXTREM_OF_BASE] - self.quote_df[OPEN]) / self.quote_df[OPEN]).round(5)
       self.__loss_sr.loc[self.__loss_sr < -self.loss_limit] = -self.loss_limit
     return self.__loss_sr
   
@@ -127,7 +127,7 @@ class ProfitCalculationContainer:
     return self.__profit_sr
   
   def __get_profit_sr(self)->pd.Series:
-    _ret_profit =  self.trading_dir.value * (self.close_price_sr - self.quote_df[OPEN]) / self.quote_df[OPEN]
+    _ret_profit =  (self.trading_dir.value * (self.close_price_sr - self.quote_df[OPEN]) / self.quote_df[OPEN]).round(5)
     return _ret_profit.rename(PROFIT)
   
   def _filter_income_reach_extrem_before_loss_reach_limit(self)->pd.Series:

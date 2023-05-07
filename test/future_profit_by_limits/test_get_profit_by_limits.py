@@ -253,6 +253,56 @@ class ProfitForLongDirection_TestCase(unittest.TestCase):
     
     self.assertTrue(expected_sr.equals(asserted_sr))  
     
+  
+  def test_WHEN_loss_is_not_rounded_THEN_loss_work_correct(self):
+    # Array
+    # 2-nd candle reach loss
+    # last candle reach income limit
+    quote_df = pd.DataFrame({OPEN:[10.3,12,13], LOW:[10,9.1,10], HIGH:[11,13,15], CLOSE:[10,12,13]}, index=[1,2,3])
+    expected_sr = pd.Series({
+      opcn.PROFIT:-0.1,
+      opcn.CLOSE_PRICE:9.27, 
+      opcn.SHIFT_TO_CLOSE:1,
+      opcn.IDX_OF_CLOSE:2.0, 
+      opcn.TYPE_OF_CLOSE: ClosingType.OnLossLimit
+      }, name=1)
+        
+    # Act
+    metric_df = get_profit_by_limit(quote_df, self.direction,0.5,0.1,3)
+    asserted_sr = metric_df.iloc[0]
+    asserted_sr[opcn.CLOSE_PRICE] = round(asserted_sr[opcn.CLOSE_PRICE],5)
+    
+    # Assert
+    self.logger.info(f"Metric DF:\n{metric_df}")
+    self.logger.info(f"Expected SR:\n{expected_sr}")
+    self.logger.info(f"Asserted SR:\n{asserted_sr}")
+    
+    self.assertTrue(expected_sr.equals(asserted_sr))  
+  
+  def test_WHEN_income_is_not_rounded_THEN_loss_work_correct(self):
+    # Array
+    # 2-nd candle reach loss
+    # last candle reach income limit
+    quote_df = pd.DataFrame({OPEN:[10.3,12,13], LOW:[10,10,10], HIGH:[11,13,17], CLOSE:[10,12,13]}, index=[1,2,3])
+    expected_sr = pd.Series({
+      opcn.PROFIT:0.5,
+      opcn.CLOSE_PRICE:15.45, 
+      opcn.SHIFT_TO_CLOSE:2,
+      opcn.IDX_OF_CLOSE:3.0, 
+      opcn.TYPE_OF_CLOSE: ClosingType.OnIncomeLimit
+      }, name=1)
+        
+    # Act
+    metric_df = get_profit_by_limit(quote_df, self.direction,0.5,0.1,3)
+    asserted_sr = metric_df.iloc[0]
+    asserted_sr[opcn.CLOSE_PRICE] = round(asserted_sr[opcn.CLOSE_PRICE],5)
+    
+    # Assert
+    self.logger.info(f"Metric DF:\n{metric_df}")
+    self.logger.info(f"Expected SR:\n{expected_sr}")
+    self.logger.info(f"Asserted SR:\n{asserted_sr}")
+    
+    self.assertTrue(expected_sr.equals(asserted_sr)) 
     
 class ProfitForShortDirection_TestCase(unittest.TestCase):
 
@@ -500,3 +550,52 @@ class ProfitForShortDirection_TestCase(unittest.TestCase):
     
     self.assertTrue(expected_sr.equals(asserted_sr))  
     
+  def test_WHEN_loss_is_not_rounded_THEN_loss_work_correct(self):
+    # Array
+    # 2-nd candle reach loss
+    # last candle reach income limit
+    quote_df = pd.DataFrame({OPEN:[10.3,12,13], LOW:[10,10,10], HIGH:[11,13,15], CLOSE:[10,12,13]}, index=[1,2,3])
+    expected_sr = pd.Series({
+      opcn.PROFIT:-0.1,
+      opcn.CLOSE_PRICE:11.33, 
+      opcn.SHIFT_TO_CLOSE:1,
+      opcn.IDX_OF_CLOSE:2.0, 
+      opcn.TYPE_OF_CLOSE: ClosingType.OnLossLimit
+      }, name=1)
+        
+    # Act
+    metric_df = get_profit_by_limit(quote_df, self.direction,0.5,0.1,3)
+    asserted_sr = metric_df.iloc[0]
+    asserted_sr[opcn.CLOSE_PRICE] = round(asserted_sr[opcn.CLOSE_PRICE],5)
+    
+    # Assert
+    self.logger.info(f"Metric DF:\n{metric_df}")
+    self.logger.info(f"Expected SR:\n{expected_sr}")
+    self.logger.info(f"Asserted SR:\n{asserted_sr}")
+    
+    self.assertTrue(expected_sr.equals(asserted_sr))  
+  
+  def test_WHEN_income_is_not_rounded_THEN_loss_work_correct(self):
+    # Array
+    # 2-nd candle reach loss
+    # last candle reach income limit
+    quote_df = pd.DataFrame({OPEN:[10.3,12,13], LOW:[10,4,10], HIGH:[11,11,17], CLOSE:[10,12,13]}, index=[1,2,3])
+    expected_sr = pd.Series({
+      opcn.PROFIT:0.5,
+      opcn.CLOSE_PRICE:5.15, 
+      opcn.SHIFT_TO_CLOSE:1,
+      opcn.IDX_OF_CLOSE:2.0, 
+      opcn.TYPE_OF_CLOSE: ClosingType.OnIncomeLimit
+      }, name=1)
+        
+    # Act
+    metric_df = get_profit_by_limit(quote_df, self.direction,0.5,0.1,3)
+    asserted_sr = metric_df.iloc[0]
+    asserted_sr[opcn.CLOSE_PRICE] = round(asserted_sr[opcn.CLOSE_PRICE],5)
+    
+    # Assert
+    self.logger.info(f"Metric DF:\n{metric_df}")
+    self.logger.info(f"Expected SR:\n{expected_sr}")
+    self.logger.info(f"Asserted SR:\n{asserted_sr}")
+    
+    self.assertTrue(expected_sr.equals(asserted_sr)) 
