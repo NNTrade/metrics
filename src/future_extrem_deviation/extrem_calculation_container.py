@@ -2,57 +2,81 @@ import pandas as pd
 from .extrem_type import ExtreamType
 from typing import Tuple
 
-
 class ExtremCalculationContainer:
-  def __init__(self,open_sr:pd.Series, shifted_v_df:pd.DataFrame,extrem_type:ExtreamType, limit:float) -> None:
+  def __init__(self,open_sr:pd.Series, extr_value_sr:pd.Series ,extrem_type:ExtreamType, limit:float,period_limit:int = None) -> None:
+    if limit <= 0:
+      raise AttributeError("Limit must be positive number")
+    if period_limit is not None and period_limit <=0:
+      raise AttributeError("Period limit must be >= 1")
     self.open_sr = open_sr
-    self.shifted_v_df = shifted_v_df
     self.extrem_type = extrem_type
     self.limit = limit
     self.sided_limit = extrem_type.value * limit 
+    self.extr_value_sr = extr_value_sr
+    self.shift_limit = period_limit if period_limit is not None else len(extr_value_sr.index)
     pass
   
-  def __get_new_value_rel_sr(self,new_value_sr: pd.Series):
-    using_open_sr = self.open_sr.loc[new_value_sr.index]
-    new_rel_sr:pd.Series = new_value_sr / using_open_sr - 1 #(new_value_sr  - using_open_sr) / using_open_sr
-    
+  def __get_new_value_rel_sr(self,value_sr: pd.Series):
+    using_open_sr = self.open_sr.loc[value_sr.index]
+    new_rel_sr:pd.Series = value_sr / using_open_sr - 1 #(new_value_sr  - using_open_sr) / using_open_sr
+    new_value_sr = value_sr.copy()
     over_limit_sr = (self.extrem_type.value * new_rel_sr - self.limit) > 0
     if len(over_limit_sr) > 0:
       new_rel_sr[over_limit_sr] = self.sided_limit
       new_value_sr[over_limit_sr] = (self.sided_limit + 1) * using_open_sr[over_limit_sr]
     return new_value_sr,new_rel_sr
   
-  def get_extrem_with_lim(self)->Tuple[pd.Series,pd.Series]:
-    if self.limit <= 0:
-      raise AttributeError("Limit must be positive number")
-    
-    extremum_value_sr, extremum_relation_sr = self.__get_new_value_rel_sr(self.shifted_v_df[self.shifted_v_df.columns[0]])
-    extremum_idx_sr = pd.Series(0, index=extremum_value_sr.index)
-    
-    for c in self.shifted_v_df.columns[1:]:
-        new_value_sr, new_rel_sr = self.__get_new_value_rel_sr(self.shifted_v_df[c][self.__get_filter_new_extrem_better_than_current(extremum_value_sr, c) &
-                                                                                    self.__get_filter_rel_sr_not_overstep_limit(extremum_relation_sr)])
+  #def get_extrem_with_lim(self)->Tuple[pd.Series,pd.Series]:
+  #  if self.limit <= 0:
+  #    raise AttributeError("Limit must be positive number")
+  #  
+  #  extremum_value_sr, extremum_relation_sr = self.__get_new_value_rel_sr(self.extr_value_sr)
+  #  extremum_idx_sr = pd.Series(0, index=extremum_value_sr.index)
+  #  
+  #  for c in self.shifted_v_df.columns[1:]:
+  #      cur_values_sr = self.shifted_v_df[c]
+  #      new_value_sr, new_rel_sr = self.__get_new_value_rel_sr(cur_values_sr[self.__get_filter_new_extrem_better_than_current(extremum_value_sr, cur_values_sr) &
+  #                                                                                  self.__get_filter_rel_sr_not_overstep_limit(extremum_relation_sr)])
+  #
+  #      extremum_value_sr.loc[new_value_sr.index] = new_value_sr
+  #      extremum_idx_sr.loc[new_value_sr.index] = c
+  #      extremum_relation_sr.loc[new_value_sr.index] = new_rel_sr
+  #      if self.__check_if_all_rel_sr_overstep_limit(extremum_relation_sr):
+  #        break
+  #      
+  #  return extremum_relation_sr, extremum_value_sr, extremum_idx_sr
 
+  def get_extrem_with_lim(self)->Tuple[pd.Series,pd.Series]:
+
+    
+    extremum_value_sr, extremum_relation_sr = self.__get_new_value_rel_sr(self.extr_value_sr)
+    extremum_shift_sr = pd.Series(0, index=extremum_value_sr.index)
+    
+    for shift in range(1, self.shift_limit):
+        cur_values_sr = self.extr_value_sr.shift(-shift)
+        new_value_sr, new_rel_sr = self.__get_new_value_rel_sr(cur_values_sr[self.__get_filter_new_extrem_better_than_current(extremum_value_sr, cur_values_sr) &
+                                                                                    self.__get_filter_rel_sr_not_overstep_limit(extremum_relation_sr)])
+  
         extremum_value_sr.loc[new_value_sr.index] = new_value_sr
-        extremum_idx_sr.loc[new_value_sr.index] = c
+        extremum_shift_sr.loc[new_value_sr.index] = shift
         extremum_relation_sr.loc[new_value_sr.index] = new_rel_sr
         if self.__check_if_all_rel_sr_overstep_limit(extremum_relation_sr):
           break
         
-    return extremum_relation_sr, extremum_value_sr, extremum_idx_sr
-
-  def __get_filter_new_extrem_better_than_current(self, extremum_value_sr:pd.Series, shift_column:str)->pd.Series:
+    return extremum_relation_sr, extremum_value_sr, extremum_shift_sr
+  
+  def __get_filter_new_extrem_better_than_current(self, extremum_value_sr:pd.Series, cur_values_sr:pd.Series)->pd.Series:
     """get pandas filter for extream values DataFrame(self.shifted_v_df), \n
-       where value from self.shifted_v_df[shift_column] is better than current value in extremum_value_sr
+       where value from cur_values_sr is better than current value in extremum_value_sr
 
     Args:
         extremum_value_sr (pd.Series): current extremum values
-        shift_column (str): name of column of shifted values
+        cur_extrem_sr (pd.Series): current price values
 
     Returns:
         pd.Series: Pandas filter
     """
-    return (self.extrem_type.value * ( self.shifted_v_df[shift_column] - extremum_value_sr) > 0)
+    return (self.extrem_type.value * ( cur_values_sr - extremum_value_sr) > 0)
 
   def __get_filter_rel_sr_not_overstep_limit(self, rel_sr:pd.Series)->pd.Series:
     """get pandas filter for relation series (rel_sr), \n

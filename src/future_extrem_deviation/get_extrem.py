@@ -44,7 +44,7 @@ def get_extrem_of(quote_df:pd.DataFrame, period:int, extrem_type:ExtreamType, li
       extrem_sr = shifted_v_df.min(axis=1)
       shift_to_extrem = shifted_v_df.idxmin(axis=1).astype(int)
   else:
-    _, extrem_sr, shift_to_extrem = ExtremCalculationContainer(quote_df[OPEN], shifted_v_df, extrem_type, limit).get_extrem_with_lim()
+    _, extrem_sr, shift_to_extrem = ExtremCalculationContainer(quote_df[OPEN], quote_df[col], extrem_type, limit,period).get_extrem_with_lim()
   extrem_id_sr = shifted_idx_df.apply(lambda row: row[shift_to_extrem.loc[row.name]], axis=1)
   return pd.DataFrame({result_v_name: extrem_sr,result_id_name:extrem_id_sr, result_shift_name:shift_to_extrem}, index=quote_df.index)
   #return (shifted_v_df.max(axis=1) if extrem_type == ExtreamType.High else shifted_v_df.min(axis=1)).rename(result_v_name)

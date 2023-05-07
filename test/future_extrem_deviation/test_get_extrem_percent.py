@@ -287,7 +287,7 @@ class GetLowExtrem_with_limits_TestCase(unittest.TestCase):
     # Array
     base_df = pd.DataFrame({OPEN: [100,102,103,104], LOW: [91,value,1200,110]}, index=[1,2,3,4])
     expected_sr = pd.Series({
-      opcn.REL_OF_LOW: (90-100)/100,
+      opcn.REL_OF_LOW: -0.1,
       opcn.EXTREM_OF_LOW:90,
       opcn.IDX_OF_LOW: 2,
       opcn.SHIFT_OF_LOW: 1,      
@@ -355,7 +355,50 @@ class GetExtremPercentOf_TestCase(unittest.TestCase):
   logger = logging.getLogger(__name__)
   logging.basicConfig(format='%(asctime)s %(module)s %(levelname)s: %(message)s',
                       datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
+   
+  
+  def test_WHEN_give_period_over_len_of_data_THEN_get_correct_responce(self):
+    # Array
+    base_df = pd.DataFrame({OPEN: [100,102,103,104], LOW: [91,1000,91,110]}, index=[1,2,3,4])
+    expected_sr = pd.Series({
+      opcn.REL_OF_LOW: (91-100)/100,
+      opcn.EXTREM_OF_LOW:91,
+      opcn.IDX_OF_LOW: 1,
+      opcn.SHIFT_OF_LOW: 0,      
+    })
     
+    # Act
+    metric_df = get_extrem_rel_of(base_df, 100, ExtreamType.Low, 0.1)
+    asserted_sr = metric_df.iloc[0]
+    
+    # Assert
+    self.logger.info(f"Metric DF:\n{metric_df}")
+    self.logger.info(f"Expected SR:\n{expected_sr}")
+    self.logger.info(f"Asserted SR:\n{asserted_sr}")
+    
+    self.assertTrue(expected_sr.equals(asserted_sr))
+    
+  def test_WHEN_give_period_1_THEN_get_one_candle_data(self):
+    # Array
+    base_df = pd.DataFrame({OPEN: [100,102,103,104], LOW: [92,1000,91,110]}, index=[1,2,3,4])
+    expected_sr = pd.Series({
+      opcn.REL_OF_LOW: (92-100)/100,
+      opcn.EXTREM_OF_LOW:92,
+      opcn.IDX_OF_LOW: 1,
+      opcn.SHIFT_OF_LOW: 0,      
+    })
+    
+    # Act
+    metric_df = get_extrem_rel_of(base_df, 1, ExtreamType.Low, 0.1)
+    asserted_sr = metric_df.iloc[0]
+    
+    # Assert
+    self.logger.info(f"Metric DF:\n{metric_df}")
+    self.logger.info(f"Expected SR:\n{expected_sr}")
+    self.logger.info(f"Asserted SR:\n{asserted_sr}")
+    
+    self.assertTrue(expected_sr.equals(asserted_sr))
+   
   def test_WHEN_give_negative_limit_THEN_get_error(self):
     # Array
     base_df = pd.DataFrame({OPEN: [1,10,100,1000], LOW: [10,15,12,11]}, index=[1,2,3,4])
