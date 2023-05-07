@@ -18,7 +18,7 @@ lib = "NNTrade.metric"
 
 setuptools.setup(
     name=lib,
-    version="4.3.0",
+    version="4.3.1",
     author="InsonusK",
     author_email="insonus.k@gmail.com",
     description="Framework with metrics for trading robots",
