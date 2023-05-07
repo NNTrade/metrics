@@ -1,7 +1,7 @@
 import pandas as pd
 from .extrem_type import ExtreamType
 from NNTrade.common.candle_col_name import OPEN, HIGH, LOW
-from typing import List, Tuple
+from typing import List
 from .constant.output_col_name import get_idx_col, get_shift_col, get_value_col, get_rel_col
 from .extrem_calculation_container import ExtremCalculationContainer
 
