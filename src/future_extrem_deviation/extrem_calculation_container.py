@@ -25,30 +25,8 @@ class ExtremCalculationContainer:
       new_rel_sr[over_limit_sr] = self.sided_limit
       new_value_sr[over_limit_sr] = (self.sided_limit + 1) * using_open_sr[over_limit_sr]
     return new_value_sr,new_rel_sr
-  
-  #def get_extrem_with_lim(self)->Tuple[pd.Series,pd.Series]:
-  #  if self.limit <= 0:
-  #    raise AttributeError("Limit must be positive number")
-  #  
-  #  extremum_value_sr, extremum_relation_sr = self.__get_new_value_rel_sr(self.extr_value_sr)
-  #  extremum_idx_sr = pd.Series(0, index=extremum_value_sr.index)
-  #  
-  #  for c in self.shifted_v_df.columns[1:]:
-  #      cur_values_sr = self.shifted_v_df[c]
-  #      new_value_sr, new_rel_sr = self.__get_new_value_rel_sr(cur_values_sr[self.__get_filter_new_extrem_better_than_current(extremum_value_sr, cur_values_sr) &
-  #                                                                                  self.__get_filter_rel_sr_not_overstep_limit(extremum_relation_sr)])
-  #
-  #      extremum_value_sr.loc[new_value_sr.index] = new_value_sr
-  #      extremum_idx_sr.loc[new_value_sr.index] = c
-  #      extremum_relation_sr.loc[new_value_sr.index] = new_rel_sr
-  #      if self.__check_if_all_rel_sr_overstep_limit(extremum_relation_sr):
-  #        break
-  #      
-  #  return extremum_relation_sr, extremum_value_sr, extremum_idx_sr
 
   def get_extrem_with_lim(self)->Tuple[pd.Series,pd.Series]:
-
-    
     extremum_value_sr, extremum_relation_sr = self.__get_new_value_rel_sr(self.extr_value_sr)
     extremum_shift_sr = pd.Series(0, index=extremum_value_sr.index)
     
