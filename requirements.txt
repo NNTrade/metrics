@@ -1,4 +1,3 @@
-NNTrade.source.market @ git+https://git@github.com/NNTrade/market-source-lib.git#egg=NNTrade.source.market
 pandas
 numpy
 zigzag

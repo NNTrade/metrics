@@ -1,5 +1,4 @@
 from typing import List,Union
-#from traiding.indicator.RelativePercent.Factory import get_percent
 import pandas as pd
 import numpy as np
 from enum import Enum
